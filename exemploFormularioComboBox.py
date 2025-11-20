@@ -24,16 +24,17 @@ class ExemploInterfaceComboBox(QMainWindow):
         grupo1.setExclusive(True)
         grupo2 = QButtonGroup(self)
         grupo2.setExclusive(True)
-        rbtBoton1 = QRadioButton("Boton1", self)
+        self.rbtBoton1 = QRadioButton("Boton1", self)
+        self.rbtBoton1.toggled.connect(self.on_rbtBoton1_toggled)
         rbtBoton2 = QRadioButton("Boton2", self)
         rbtBoton3 = QRadioButton("Boton3", self)
         rbtBoton4 = QRadioButton("Boton4", self)
-        grupo1.addButton(rbtBoton1)
+        grupo1.addButton(self.rbtBoton1)
         grupo1.addButton(rbtBoton2)
         grupo2.addButton(rbtBoton3)
         grupo2.addButton(rbtBoton4)
 
-        caixaV1.addWidget(rbtBoton1)
+        caixaV1.addWidget(self.rbtBoton1)
         caixaV1.addWidget(rbtBoton2)
         caixaV1.addWidget(rbtBoton3)
         caixaV1.addWidget(rbtBoton4)
@@ -42,8 +43,11 @@ class ExemploInterfaceComboBox(QMainWindow):
         clasificador.setTabPosition(QTabWidget.TabPosition.North)
         maia.addWidget(clasificador, 0, 1, 1, 1)
         self.tvwTaboa = QTableView()
+        self.tvwTaboa.setSelectionMode (QTableView.SelectionMode.SingleSelection)
         self.modelo = ModeloTaboa(datos)
         self.tvwTaboa.setModel(self.modelo)
+        self.seleccion = self.tvwTaboa.selectionModel()
+        self.seleccion.selectionChanged.connect(self.on_tvwTaboa_selectionChanged)
         clasificador.addTab(self.tvwTaboa, "Taboa")
         txeOutroCadroTexto = QTextEdit()
         clasificador.addTab(txeOutroCadroTexto, "Cadro texto")
@@ -73,6 +77,19 @@ class ExemploInterfaceComboBox(QMainWindow):
 
     def on_cmbComboBox_currentTextChanged(self, texto):
         print("O combo ten seleccionado o texto: " + texto)
+
+    def on_tvwTaboa_selectionChanged(self):
+        indices = self.tvwTaboa.selectedIndexes()
+        if indices is not None:
+            print(self.modelo.taboa[indices[0].row()][indices[0].column()])
+            self.txeAreaTexto.setPlainText(self.modelo.taboa[indices[0].row()][indices[0].column()])
+
+    def on_rbtBoton1_toggled(self):
+        if self.rbtBoton1.isChecked():
+            campos = self.txeAreaTexto.toPlainText().split(",")
+            print(campos)
+            self.modelo.taboa.append ([campos[0], campos[1], campos[2], True if campos[3] == 'True' else False])
+            self.modelo.layoutChanged.emit()
 
 if __name__ == "__main__":
     aplicacion = QApplication(sys.argv)

@@ -8,7 +8,10 @@ class ModeloTaboa (QAbstractTableModel):
 
     def data(self, indice, rol):
         if rol == Qt.ItemDataRole.DisplayRole:
-            return self.taboa[indice.row()][indice.column()]
+            if indice.column() == 3 and indice.row() !=0:
+                return ""
+            else:
+                return self.taboa[indice.row()][indice.column()]
         if rol == Qt.ItemDataRole.BackgroundRole:
             if self.taboa[indice.row()] [2] == "Home":
                 return QtGui.QColor ('lightblue')
@@ -18,6 +21,12 @@ class ModeloTaboa (QAbstractTableModel):
             if self.taboa[indice.row()][3] == True:
                 if (indice.column()==3):
                     return QtGui.QColor('red')
+        if rol == Qt.ItemDataRole.DecorationRole:
+            if isinstance(self.taboa[indice.row()][indice.column()], bool):
+                if self.taboa[indice.row()][indice.column()]:
+                    return QtGui.QIcon('tic16x16.jpg')
+                else:
+                    return QtGui.QIcon ('equis16x216.jpg')
 
     def rowCount(self, indice):
         return len (self.taboa)
